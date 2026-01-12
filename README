@@ -1,0 +1,190 @@
+# Dulcería por Mayoreo (Cliente–Servidor)
+
+Proyecto escolar con arquitectura cliente–servidor:
+- Backend: API REST con Flask y SQLAlchemy
+- Frontend: React y Material UI consumiendo la API
+
+Incluye manejo de precios por mayoreo (rangos de precio / tiers) por producto y flujo de pedidos.
+
+---
+
+## Funcionalidades
+
+### Cliente
+- Registro e inicio de sesión
+- Ver catálogo
+- Agregar al carrito viendo rangos de precio y precio aplicado por cantidad
+- Crear pedido
+- Ver “Mis pedidos” y detalle del pedido
+
+### Admin
+- Dashboard (métricas básicas)
+- CRUD de productos
+- Configurar rangos de precio (min_qty → unit_price)
+- CRUD de clientes
+- Crear usuarios y listar usuarios
+- Ver pedidos y cambiar status (pendiente / pagado / cancelado)
+
+---
+
+## Tecnologías
+- Python, Flask, Flask-JWT-Extended, Flask-Migrate, SQLAlchemy, SQLite
+- React (Vite), Material UI, React Router
+
+---
+
+## Estructura
+
+dulceriaWeb/
+
+    dulceria-api/
+        app/
+        migrations/
+        run.py
+        requirements.txt
+        .env
+        seed_demo.py (opcional)
+
+    dulceria-frontend/
+        src/
+        vite.config.js
+        package.json
+
+---
+
+## Requisitos
+- Python 3.10+ 
+- Node.js 18+ 
+
+---
+
+## Backend (Flask) — Instalación y ejecución (Windows PowerShell)
+
+    ### 1) Entrar al backend
+
+    ### 2) Crear y activar venv
+
+    python -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+
+
+    ### 3) Instalar dependencias
+
+    pip install -r requirements.txt
+
+
+    ### 4) Migraciones
+
+    (dentro del .venv)
+    flask db upgrade
+
+    ### 5) (Opcional) Cargar datos demo proporcionados
+
+    python .\seed_demo.py
+
+    ### 6) Ejecutar backend
+
+    python .\run.py
+
+    Backend en:
+
+    * `http://127.0.0.1:5000`
+
+---
+
+## Frontend (React + MUI) — Instalación y ejecución
+
+    ### 1) Entrar al frontend
+
+    ### 2) Instalar dependencias
+
+    npm install
+
+    ### 3) Proxy /api → backend (dev)
+
+    En `frontend/vite.config.js` debes tener:
+
+    server: {
+    proxy: {
+        "/api": "http://127.0.0.1:5000",
+    },
+    }
+
+
+    ### 4) Ejecutar frontend
+
+    npm run dev
+
+    Frontend en:
+
+    * `http://localhost:5173`
+
+---
+
+## Documentación con Swagger 
+
+* `http://127.0.0.1:5000/apidocs`
+
+---
+
+## Flujo de demostración con credenciales de ejemplo (provenientes del seed_demo proporcionado)
+
+### Cliente
+
+1. Registrarse (desde Login → “Crear cuenta”) 
+    o inicia sesión con el email "compras@esquina.com" y la contraseña "Cliente123!"
+2. Catálogo → abrir “Agregar al carrito”
+3. Elegir cantidad y ver cómo cambia el precio por tiers
+4. Crear pedido
+5. Ir a “Mis pedidos” → ver detalle
+
+### Admin
+
+1. Iniciar sesión como admin con el email "admin@dulceria.com" y la contraseña "Admin123!"
+2. Dashboard
+3. Productos → abrir “Tiers” y enseñar reglas min_qty
+4. Pedidos → marcar “pagado” o “cancelado”
+
+---
+
+## Endpoints más relevantes
+
+* Auth:
+
+  * `POST /api/auth/login`
+  * `POST /api/auth/register`
+  * `GET  /api/auth/me`
+* Productos:
+
+  * `GET  /api/products`
+  * `POST /api/products` (admin)
+  * `PUT  /api/products/:id` (admin)
+  * `DELETE /api/products/:id` (admin)
+  * `GET  /api/products/:id/price-tiers`
+  * `POST /api/products/:id/price-tiers` (admin)
+  * `DELETE /api/price-tiers/:tier_id` (admin)
+* Pedidos:
+
+  * `GET  /api/orders` (cliente: solo su customer / admin: todos)
+  * `POST /api/orders` (cliente)
+  * `GET  /api/orders/:id`
+  * `PUT  /api/orders/:id/status` (admin)
+* Admin:
+
+  * `GET /api/admin/dashboard` (admin)
+  * `GET /api/admin/reports/top-products` (admin)
+  * `GET /api/admin/reports/low-stock` (admin)
+  * `GET /api/admin/users` (admin)
+* Clientes:
+
+  * `GET/POST/PUT/DELETE /api/customers` (admin)
+
+---
+
+### Reinicio de la base de datos en caso de ser necesario
+
+* Borra `dulceria.db`
+* Corre `flask db upgrade`
+* Corre `python seed_demo.py` en caso de volver a querer los datos de prueba
+
+---
