@@ -242,5 +242,5 @@ def register():
         db.session.rollback()
         return jsonify({"error": "Ese email ya está registrado"}), 409
 
-    token = create_access_token(identity=u.id, additional_claims={"role": u.role})
+    token = create_access_token(identity=str(u.id), additional_claims={"role": u.role})
     return jsonify({"access_token": token, "user": u.to_dict()}), 201

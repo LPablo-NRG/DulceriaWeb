@@ -4,7 +4,7 @@ from sqlalchemy.orm import selectinload
 from ..extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from ..authz import require_role
-from ..models import Order, OrderItem, Customer, Product, User, PriceTier
+from ..models import Order, OrderItem, Customer, Product, User, PriceTier, Payment
 
 bp = Blueprint("orders", __name__, url_prefix="/api/orders")
 
@@ -370,3 +370,20 @@ def update_order_status(order_id: int):
     o.status = status
     db.session.commit()
     return jsonify(o.to_dict(include_items=True))
+
+@bp.get("/<int:order_id>/payment")
+@jwt_required()
+def get_order_payment(order_id: int):
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"error": "Pedido no encontrado"}), 404
+
+    claims = get_jwt()
+    if claims.get("role") != "admin":
+        user = User.query.get(int(get_jwt_identity()))
+        if not user or user.customer_id != order.customer_id:
+            return jsonify({"error": "No autorizado"}), 403
+
+    p = Payment.query.filter_by(order_id=order_id).first()
+    
+    return jsonify(p.to_dict() if p else None), 200

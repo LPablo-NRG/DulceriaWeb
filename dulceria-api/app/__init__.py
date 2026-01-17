@@ -8,6 +8,7 @@ from .routes.admin_reports import bp as admin_reports_bp
 from flasgger import Swagger
 from .routes.site import bp as site_bp
 from .routes.admin_users import bp as admin_users_bp
+from .routes.admin_payments import bp as admin_payments_bp
 
 def create_app():
     load_dotenv()
@@ -55,6 +56,7 @@ def create_app():
     app.register_blueprint(admin_reports_bp)
     app.register_blueprint(site_bp)
     app.register_blueprint(admin_users_bp)
+    app.register_blueprint(admin_payments_bp)
     
     @app.get("/health")
     def health():

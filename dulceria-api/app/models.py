@@ -70,7 +70,7 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     customer_id = db.Column(db.Integer, db.ForeignKey("customers.id"), nullable=False, index=True)
-    status = db.Column(db.String(30), nullable=False, default="pendiente", index=True)  # pendiente|pagado|enviado|cancelado
+    status = db.Column(db.String(30), nullable=False, default="pendiente", index=True) 
 
     total = db.Column(db.Numeric(10, 2), nullable=False, default=0)
 
@@ -129,7 +129,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(200), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default="cliente")  # admin | cliente
+    role = db.Column(db.String(20), nullable=False, default="cliente")  
 
     customer_id = db.Column(db.Integer, db.ForeignKey("customers.id"), nullable=True, index=True)
     customer = db.relationship("Customer")
@@ -178,3 +178,34 @@ class PriceTier(db.Model):
 from datetime import datetime
 from .extensions import db
 
+class Payment(db.Model):
+    __tablename__ = "payments"
+    __table_args__ = (
+        UniqueConstraint("order_id", name="uq_payment_order_id"),  
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False, index=True)
+
+    amount = db.Column(db.Numeric(10, 2), nullable=False)
+    method = db.Column(db.String(30), nullable=False)  
+    paid_at = db.Column(db.DateTime, nullable=False)
+    received_by = db.Column(db.String(120), nullable=False)
+    reference = db.Column(db.String(120), nullable=True)   
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    order = db.relationship("Order", backref=db.backref("payment", uselist=False))
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "order_id": self.order_id,
+            "amount": float(self.amount),
+            "method": self.method,
+            "paid_at": self.paid_at.isoformat() + "Z",
+            "received_by": self.received_by,
+            "reference": self.reference,
+            "created_at": self.created_at.isoformat() + "Z",
+        }
