@@ -21,8 +21,8 @@ export default function AdminDashboard() {
       <Stack sx={{ mt: 1 }} spacing={1}>
         <Typography>Órdenes: {d.orders_count}</Typography>
         <Typography>Pagadas: {d.paid_orders_count}</Typography>
-        <Typography>Revenue (pagadas): {money(d.revenue_from_paid_orders)}</Typography>
-        <Typography>Suma pagos: {money(d.payments_sum)}</Typography>
+        <Typography>Ganancias: {money(d.revenue_from_paid_orders)}</Typography>
+        
       </Stack>
     </Paper>
   );

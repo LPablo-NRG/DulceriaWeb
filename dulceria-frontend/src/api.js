@@ -25,6 +25,7 @@ export async function api(path, { method = "GET", body, auth = true } = {}) {
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;
 
-  if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+  if (!res.ok) throw new Error(data?.error || data?.msg || data?.message || `HTTP ${res.status}`);
+
   return data;
 }

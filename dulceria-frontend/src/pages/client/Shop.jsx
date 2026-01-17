@@ -26,6 +26,10 @@ import {
   Typography,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import TicketDialog from "../../components/TicketDialog";
+
+
+
 
 function pickTier(tiers, qty, fallbackPrice) {
   const list = Array.isArray(tiers) ? [...tiers] : [];
@@ -50,6 +54,8 @@ function pickTier(tiers, qty, fallbackPrice) {
 }
 
 export default function Shop() {
+  const [ticketOpen, setTicketOpen] = useState(false);
+  const [ticketOrder, setTicketOrder] = useState(null);
   const [q, setQ] = useState("");
   const [products, setProducts] = useState([]);
 
@@ -155,6 +161,12 @@ export default function Shop() {
       setCart([]);
       setCartOpen(false);
 
+      const created = await api("/api/orders", { method: "POST", body: { items } });
+      const full = await api(`/api/orders/${created.id}`);
+
+      setTicketOrder(full);
+      setTicketOpen(true);
+
       setMsg({
         type: "success",
         text: `Pedido #${order.id} creado. Total final: ${money(order.total)}.`,
@@ -165,6 +177,7 @@ export default function Shop() {
       setMsg({ type: "error", text: e.message });
     }
   }
+
 
   // datos del dialog "Agregar"
   const selectedTiers = selectedProduct ? (tiersByProduct[selectedProduct.id] || []) : [];
@@ -361,6 +374,11 @@ export default function Shop() {
           )}
         </Box>
       </Drawer>
+      <TicketDialog
+        open={ticketOpen}
+        onClose={() => setTicketOpen(false)}
+        order={ticketOrder}
+      />
     </Box>
   );
 }
